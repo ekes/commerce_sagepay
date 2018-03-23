@@ -62,7 +62,7 @@ class FormIntegration extends OffsitePaymentGatewayBase implements FormIntegrati
    *
    * @var \Drupal\Component\Datetime\TimeInterface
    */
-  private $time;
+  protected $time;
 
   /**
    * The module handler service.
@@ -96,7 +96,7 @@ class FormIntegration extends OffsitePaymentGatewayBase implements FormIntegrati
    *   The module handler service.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, PaymentTypeManager $payment_type_manager, PaymentMethodTypeManager $payment_method_type_manager, RequestStack $requestStack, LoggerChannelFactoryInterface $loggerChannelFactory, TimeInterface $time, ModuleHandlerInterface $moduleHandler) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $entity_type_manager, $payment_type_manager, $payment_method_type_manager);
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $entity_type_manager, $payment_type_manager, $payment_method_type_manager, $time);
     $this->requestStack = $requestStack;
     $this->loggerChannelFactory = $loggerChannelFactory;
     $this->time = $time;
@@ -115,7 +115,7 @@ class FormIntegration extends OffsitePaymentGatewayBase implements FormIntegrati
       '#description' => t('This is the vendor name that SagePay sent you when
      you set up your account.'),
       '#required' => TRUE,
-      '#default_value' => $this->configuration['vendor'],
+      '#default_value' => isset($this->configuration['vendor']) ? $this->configuration['vendor'] : '',
     ];
 
     $form['enc_key'] = [
@@ -343,12 +343,12 @@ class FormIntegration extends OffsitePaymentGatewayBase implements FormIntegrati
     $sagepayConfig = SagepaySettings::getInstance([
       'env' => ($gatewayConfig['mode']) ? $gatewayConfig['mode'] : SAGEPAY_ENV_TEST,
       'vendorName' => $gatewayConfig['vendor'],
-      'website' => 'http://www.google.com',
+      'website' => \Drupal::request()->getSchemeAndHttpHost(),
       'formPassword' => [
         SAGEPAY_ENV_LIVE => $gatewayConfig['enc_key'],
         SAGEPAY_ENV_TEST => $gatewayConfig['test_enc_key'],
       ],
-      'siteFqdns' => ['test' => 'http://commerce.dd:8083'],
+      'siteFqdns' => ['test' => \Drupal::request()->getSchemeAndHttpHost(), 'live' => \Drupal::request()->getSchemeAndHttpHost() ],
       'formSuccessUrl' => $this->buildReturnUrl($order),
       'formFailureUrl' => $this->buildCancelUrl($order),
       'surcharges' => [],
