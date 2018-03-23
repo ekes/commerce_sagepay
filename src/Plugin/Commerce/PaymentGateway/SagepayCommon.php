@@ -29,6 +29,7 @@ trait SagepayCommon {
     $billingAddress = $order->getBillingProfile()->get('address')->first();
 
     $billingDetails = [
+      'customerEmail' => $order->get('mail')->first()->value,
       'BillingFirstnames' => $billingAddress->getGivenName(),
       'BillingSurname' => $billingAddress->getFamilyName(),
       'BillingAddress1' => $billingAddress->getAddressLine1(),
