@@ -145,7 +145,7 @@ trait SagepayCommon {
       $basketItem = new SagepayItem();
       $basketItem->setDescription($item->label());
       $basketItem->setProductCode($product->id());
-      $basketItem->setProductSku($product->getSku());
+      $basketItem->setProductSku(substr($product->getSku(), 0, 12));
       $basketItem->setQuantity($item->getQuantity());
       $basketItem->setUnitNetAmount($item->getUnitPrice()->getNumber());
       $basket->addItem($basketItem);
