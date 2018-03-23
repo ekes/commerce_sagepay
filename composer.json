@@ -11,6 +11,8 @@
     "source": "http://cgit.drupalcode.org/commerce_sagepay"
   },
   "require": {
-    "drupal/commerce": "~2"
+    "drupal/commerce": "~2",
+    "ext-curl": "*",
+    "ext-openssl": "*"
   }
 }
