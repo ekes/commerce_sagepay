@@ -127,17 +127,9 @@ class SagepayUtil
      *
      * @return string The encrypted string.
      */
-    static public function encryptAes($string, $key)
+    static public function encryptAes($strIn, $password)
     {
-        // AES encryption, CBC blocking with PKCS5 padding then HEX encoding.
-        // Add PKCS5 padding to the text to be encypted.
-        $string = self::addPKCS5Padding($string);
-
-        // Perform encryption with PHP's MCRYPT module.
-        $crypt = mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $key, $string, MCRYPT_MODE_CBC, $key);
-
-        // Perform hex encoding and return.
-        return "@" . strtoupper(bin2hex($crypt));
+      return "@" . strtoupper(bin2hex(openssl_encrypt($strIn, 'AES-128-CBC', $password, OPENSSL_PKCS1_PADDING, $password)));
     }
 
     /**
@@ -151,23 +143,9 @@ class SagepayUtil
      */
     static public function decryptAes($strIn, $password)
     {
-        // HEX decoding then AES decryption, CBC blocking with PKCS5 padding.
-        // Use initialization vector (IV) set from $str_encryption_password.
-        $strInitVector = $password;
-
-        // Remove the first char which is @ to flag this is AES encrypted and HEX decoding.
-        $hex = substr($strIn, 1);
-
-        // Throw exception if string is malformed
-        if (!preg_match('/^[0-9a-fA-F]+$/', $hex))
-        {
-            throw new SagepayApiException('Invalid encryption string');
-        }
-        $strIn = pack('H*', $hex);
-
-        // Perform decryption with PHP's MCRYPT module.
-        $string = mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $password, $strIn, MCRYPT_MODE_CBC, $strInitVector);
-        return self::removePKCS5Padding($string);
+        $strIn = strtolower(substr($strIn, 1));
+        $strIn = pack('H*', $strIn);
+        return openssl_decrypt($strIn, 'AES-128-CBC', $password, OPENSSL_PKCS1_PADDING, $password);
     }
 
     /**
