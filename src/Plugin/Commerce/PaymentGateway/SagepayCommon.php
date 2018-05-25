@@ -37,6 +37,7 @@ trait SagepayCommon {
       'BillingCity' => $billingAddress->getLocality(),
       'BillingPostCode' => $billingAddress->getPostalCode(),
       'BillingCountry' => $billingAddress->getCountryCode(),
+      'BillingState' => $billingAddress->getAdministrativeArea(),
     ];
 
     return $this->createCustomerDetails($billingDetails, 'billing');
@@ -67,6 +68,7 @@ trait SagepayCommon {
       'DeliveryCity' => $shippingAddress->getLocality(),
       'DeliveryPostCode' => $shippingAddress->getPostalCode(),
       'DeliveryCountry' => $shippingAddress->getCountryCode(),
+      'DeliveryState' => $shippingAddress->getAdministrativeArea(),
     ];
 
     return $this->createCustomerDetails($shippingDetails, 'delivery');
