@@ -145,12 +145,32 @@ trait SagepayCommon {
       if ($basket === FALSE) {
         $basket = new SagepayBasket();
       }
+
+      $taxAmount = 0;
+      if ($adjustments = $item->getAdjustments()) {
+        foreach ($adjustments as $adjustment) {
+          if ($adjustment->getType() == 'tax') {
+            $taxAmount += (float) $adjustment->getAmount()->getNumber();
+          }
+        }
+      }
+
+      $promotionAmount = 0;
+      if ($adjustments = $item->getAdjustments()) {
+        foreach ($adjustments as $adjustment) {
+          if ($adjustment->getType() == 'promotion') {
+            $promotionAmount += (float) $adjustment->getAmount()->getNumber();
+          }
+        }
+      }
+
       $basketItem = new SagepayItem();
       $basketItem->setDescription($item->label());
       $basketItem->setProductCode($product->id());
       $basketItem->setProductSku(substr($product->getSku(), 0, 12));
       $basketItem->setQuantity($item->getQuantity());
-      $basketItem->setUnitNetAmount($item->getUnitPrice()->getNumber());
+      $basketItem->setUnitNetAmount($item->getUnitPrice()->getNumber() + $promotionAmount / $item->getQuantity());
+      $basketItem->setUnitTaxAmount($taxAmount / $item->getQuantity());
       $basket->addItem($basketItem);
 
     }

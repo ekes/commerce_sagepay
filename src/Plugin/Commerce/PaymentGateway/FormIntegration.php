@@ -294,6 +294,7 @@ class FormIntegration extends OffsitePaymentGatewayBase implements FormIntegrati
   public function buildTransaction(PaymentInterface $payment) {
     /** @var OrderInterface $order */
     $order = $payment->getOrder();
+
     $sagepayFormApi = $this->getSagepayApi($order);
 
     if (!$basket = $this->getBasketFromProducts($order)) {
@@ -304,6 +305,15 @@ class FormIntegration extends OffsitePaymentGatewayBase implements FormIntegrati
     $sagepayFormApi->setBasket($basket);
 
     $sagepayFormApi->addAddress($this->getBillingAddress($order));
+
+    $taxAmount = 0;
+    if ($adjustments = $order->getAdjustments()) {
+      foreach ($adjustments as $adjustment) {
+        if ($adjustment->getType() == 'tax') {
+          $taxAmount += (float) $adjustment->getAmount()->getNumber();
+        }
+      }
+    }
 
     if ($this->moduleHandler->moduleExists('commerce_shipping')) {
       /** @var \Drupal\commerce_shipping\Entity\ShipmentInterface[] $shipments */
@@ -318,6 +328,7 @@ class FormIntegration extends OffsitePaymentGatewayBase implements FormIntegrati
         }
       }
       $basket->setDeliveryNetAmount($delivery);
+      $basket->setDeliveryTaxAmount($taxAmount);
     }
 
     $request = $sagepayFormApi->createRequest();
@@ -351,6 +362,7 @@ class FormIntegration extends OffsitePaymentGatewayBase implements FormIntegrati
       'siteFqdns' => ['test' => \Drupal::request()->getSchemeAndHttpHost(), 'live' => \Drupal::request()->getSchemeAndHttpHost() ],
       'formSuccessUrl' => $this->buildReturnUrl($order),
       'formFailureUrl' => $this->buildCancelUrl($order),
+      'currency' => $order->getTotalPrice()->getCurrencyCode(),
       'surcharges' => [],
       'allowGiftAid' => 0,
       'logError' => FALSE,
