@@ -201,7 +201,8 @@ class FormIntegration extends OffsitePaymentGatewayBase implements FormIntegrati
    * {@inheritdoc}
    */
   public function onReturn(OrderInterface $order, Request $request) {
-    $decryptedSagepayResponse = $this->decryptSagepayResponse($this->configuration['test_enc_key'], $this->requestStack->getCurrentRequest()->query->get('crypt'));
+    $formPassword = $this->getMode() == SAGEPAY_ENV_LIVE ? $this->configuration['enc_key'] : $this->configuration['test_enc_key'];
+    $decryptedSagepayResponse = $this->decryptSagepayResponse($formPassword, $this->requestStack->getCurrentRequest()->query->get('crypt'));
 
     if (!$decryptedSagepayResponse) {
       throw new PaymentGatewayException();
