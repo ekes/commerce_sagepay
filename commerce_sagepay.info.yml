@@ -1,7 +1,7 @@
 name: Commerce Sagepay
 type: module
 description: 'Provides Integration with the SagePay Payment Gateway (http://www.sagepay.com) using Form method.'
-core: 8.x
+core_version_requirement: ^8 || ^9
 package: Commerce (contrib)
 dependencies:
   - commerce:commerce_payment
