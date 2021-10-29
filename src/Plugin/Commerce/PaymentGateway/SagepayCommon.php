@@ -200,7 +200,7 @@ trait SagepayCommon {
           '%msg' => $decryptedSagepayResponse['StatusDetail'],
         ];
         $drupalMessage = $this->t('Your SagePay transaction was aborted.');
-        $drupalMessageType = 'error';
+        $drupalMessageType = 'addError';
         break;
 
       case 'NOTAUTHED':
@@ -211,7 +211,7 @@ trait SagepayCommon {
           '%msg' => $decryptedSagepayResponse['StatusDetail'],
         ];
         $drupalMessage = $this->t('Your transaction was not authorised by SagePay.');
-        $drupalMessageType = 'error';
+        $drupalMessageType = 'addError';
         break;
 
       case 'REJECTED':
@@ -222,7 +222,7 @@ trait SagepayCommon {
           '%msg' => $decryptedSagepayResponse['StatusDetail'],
         ];
         $drupalMessage = $this->t('Your transaction was rejected by SagePay.');
-        $drupalMessageType = 'error';
+        $drupalMessageType = 'addError';
         break;
 
       case 'MALFORMED':
@@ -233,7 +233,7 @@ trait SagepayCommon {
           '%msg' => $decryptedSagepayResponse['StatusDetail'],
         ];
         $drupalMessage = $this->t('Sorry the transaction has failed.');
-        $drupalMessageType = 'error';
+        $drupalMessageType = 'addError';
         break;
 
       case 'INVALID':
@@ -244,7 +244,7 @@ trait SagepayCommon {
           '%msg' => $decryptedSagepayResponse['StatusDetail'],
         ];
         $drupalMessage = $this->t('Sorry the transaction has failed.');
-        $drupalMessageType = 'error';
+        $drupalMessageType = 'addError';
         break;
 
       case 'ERROR':
@@ -256,7 +256,7 @@ trait SagepayCommon {
           '%msg' => $decryptedSagepayResponse['StatusDetail'],
         ];
         $drupalMessage = $this->t('Sorry an error occurred while processing your transaction.');
-        $drupalMessageType = 'error';
+        $drupalMessageType = 'addError';
 
         break;
 
@@ -268,7 +268,7 @@ trait SagepayCommon {
           '%msg' => $decryptedSagepayResponse['StatusDetail'],
         ];
         $drupalMessage = $this->t('Sorry an error occurred while processing your transaction.');
-        $drupalMessageType = 'error';
+        $drupalMessageType = 'addError';
     }
 
     return [
