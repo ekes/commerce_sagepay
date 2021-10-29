@@ -241,7 +241,7 @@ class FormIntegration extends OffsitePaymentGatewayBase implements FormIntegrati
       $logContext = $sagepayError['logContext'];
       $this->loggerChannelFactory->get('commerce_sagepay')
         ->log($logLevel, $logMessage, $logContext);
-      drupal_set_message($sagepayError['drupalMessage'], $sagepayError['drupalMessageType']);
+      \Drupal::messenger()->{$sagepayError['drupalMessageType']}($sagepayError['drupalMessage']);
       throw new PaymentGatewayException('ERROR result from Sagepay for order ' . $decryptedSagepayResponse['VendorTxCode']);
     }
   }
