@@ -164,16 +164,20 @@ trait SagepayCommon {
         }
       }
 
+      $total = $item->getUnitPrice()->getNumber() + $promotionAmount / $item->getQuantity();
+      $tax = $taxAmount / $item->getQuantity();
+      $net = $total - $tax;
+
       $basketItem = new SagepayItem();
       $basketItem->setDescription($item->label());
       $basketItem->setProductCode($product->id());
       $basketItem->setProductSku(substr($product->getSku(), 0, 12));
       $basketItem->setQuantity($item->getQuantity());
-      $basketItem->setUnitNetAmount($item->getUnitPrice()->getNumber() + $promotionAmount / $item->getQuantity());
-      $basketItem->setUnitTaxAmount($taxAmount / $item->getQuantity());
+      $basketItem->setUnitNetAmount($net);
+      $basketItem->setUnitTaxAmount($tax);
       $basket->addItem($basketItem);
-
     }
+
     return $basket;
   }
 
