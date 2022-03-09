@@ -608,9 +608,13 @@ class SagepayItem
             $value = $this->$getter();
 
             $node = null;
-            if (is_string($value) || is_int($value))
+            if (is_string($value))
             {
-                $node = $basket->createElement($name, trim($value));
+                $node = $basket->createElement($name);
+                $node->appendChild($basket->createTextNode(trim($value)));
+            }
+            else if (is_int($value)) {
+                $node = $basket->createElement($name, $value);
             }
             else if (is_float($value))
             {
