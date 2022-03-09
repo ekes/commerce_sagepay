@@ -141,6 +141,9 @@ trait SagepayCommon {
 
       /** @var ProductVariationInterface $product */
       $product = $item->getPurchasedEntity();
+      if (!$product) {
+        continue;
+      }
 
       if ($basket === FALSE) {
         $basket = new SagepayBasket();
