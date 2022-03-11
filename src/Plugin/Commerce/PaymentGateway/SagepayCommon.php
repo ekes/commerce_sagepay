@@ -174,7 +174,10 @@ trait SagepayCommon {
       $basketItem = new SagepayItem();
       $basketItem->setDescription($item->label());
       $basketItem->setProductCode($product->id());
-      $basketItem->setProductSku(substr($product->getSku(), 0, 12));
+      # Can't find documentation of characters it doesn't like in a SKU but
+      # there seem to be plenty so this is pretty extreme.
+      $sku = preg_replace('/[^a-z0-9]+/i', '-', substr($product->getSku(), 0, 12));
+      $basketItem->setProductSku($sku);
       $basketItem->setQuantity($item->getQuantity());
       $basketItem->setUnitNetAmount($net);
       $basketItem->setUnitTaxAmount($tax);
