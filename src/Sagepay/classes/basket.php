@@ -686,9 +686,14 @@ class SagepayBasket
         {
             return $dom->createElement($value);
         }
-        else if (is_string($value) || is_int($value))
+        else if (is_string($value))
         {
-            return $dom->createElement($name, trim($value));
+            $node = $dom->createElement($name);
+            return $node->appendChild($dom->createTextNode(trim($value)));
+        }
+        else if (is_int($value))
+        {
+            return $dom->createElement($name, $value);
         }
         else if (is_float($value))
         {

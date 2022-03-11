@@ -275,7 +275,8 @@ class SagepayCustomer
             {
                 continue;
             }
-            $node = $dom->createElement($field, $value);
+            $node = $dom->createElement($field);
+            $node->appendChild($dom->createTextNode(trim($value)));
             $dom->documentElement->appendChild($node);
         }
         return $dom->saveXML($dom->documentElement);
