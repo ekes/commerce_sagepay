@@ -343,6 +343,18 @@ class FormIntegration extends OffsitePaymentGatewayBase implements FormIntegrati
       $basket->setDeliveryNetAmount($delivery);
     }
 
+    // Sanity check. If the basket total isn't correct override it and log it.
+    if ($order->getTotalPrice()->getNumber() != (string) $basket->getAmount()) {
+      $basket->setOverrideAmount((float) $order->getTotalPrice()->getNumber());
+      $this->loggerChannelFactory->get('commerce_sagepay')->error(
+        'Order id @id basket total was @basket instead of @total', [
+          '@id' => $order->id(),
+          '@basket' => $basket->getAmount(),
+          '@total' => $order->getTotalPrice()->getNumber(),
+        ]
+      );
+    }
+
     $request = $sagepayFormApi->createRequest();
 
     $order->setData('sagepay_form', [
