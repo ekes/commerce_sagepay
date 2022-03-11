@@ -314,6 +314,8 @@ class FormIntegration extends OffsitePaymentGatewayBase implements FormIntegrati
           $taxAmount += (float) $adjustment->getAmount()->getNumber();
         }
         elseif (!$adjustment->isIncluded() && $adjustment->getAmount()->isNegative()) {
+          // Label might not be unique. Need an associative array. Add the
+          // count.
           $discounts[] = [
             'fixed' => (float) abs($adjustment->getAmount()->getNumber()),
             'description' => $adjustment->getLabel(),
