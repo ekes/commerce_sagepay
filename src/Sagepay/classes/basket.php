@@ -329,7 +329,7 @@ class SagepayBasket
 
     /**
      * Calculate total value of discounts
-     * @return int
+     * @return float
      */
     private function getDiscountAmount()
     {
@@ -685,6 +685,20 @@ class SagepayBasket
         else if ($name === null)
         {
             return $dom->createElement($value);
+        }
+        else if ($name == 'discounts') {
+            // This should be another class like SagepayItem, but this is simple
+            // and quick.
+            $discounts = $dom->createElement('discounts');
+            foreach ($value as $discount) {
+                $node = $dom->createElement('discount');
+                $node->appendChild($dom->createElement('fixed', number_format($discount['fixed'], 2, '.', '')));
+                $description = $dom->createElement('description');
+                $description->appendChild($dom->createTextNode(trim($discount['description'])));
+                $node->appendChild($description);
+                $discounts->appendChild($node);
+            }
+            return $discounts;
         }
         else if (is_string($value))
         {

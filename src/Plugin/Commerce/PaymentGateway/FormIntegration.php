@@ -295,7 +295,6 @@ class FormIntegration extends OffsitePaymentGatewayBase implements FormIntegrati
   public function buildTransaction(PaymentInterface $payment) {
     /** @var OrderInterface $order */
     $order = $payment->getOrder();
-
     $sagepayFormApi = $this->getSagepayApi($order);
 
     if (!$basket = $this->getBasketFromProducts($order)) {
@@ -307,13 +306,24 @@ class FormIntegration extends OffsitePaymentGatewayBase implements FormIntegrati
 
     $sagepayFormApi->addAddress($this->getBillingAddress($order));
 
+    $discounts = [];
     $taxAmount = 0;
     if ($adjustments = $order->getAdjustments()) {
       foreach ($adjustments as $adjustment) {
         if ($adjustment->getType() == 'tax') {
           $taxAmount += (float) $adjustment->getAmount()->getNumber();
         }
+        elseif (!$adjustment->isIncluded() && $adjustment->getAmount()->isNegative()) {
+          $discounts[] = [
+            'fixed' => (float) abs($adjustment->getAmount()->getNumber()),
+            'description' => $adjustment->getLabel(),
+          ];
+        }
       }
+    }
+    $basket->setDeliveryTaxAmount($taxAmount);
+    if (count($discounts)) {
+      $basket->setDiscounts($discounts);
     }
 
     if ($this->moduleHandler->moduleExists('commerce_shipping')) {
@@ -329,7 +339,6 @@ class FormIntegration extends OffsitePaymentGatewayBase implements FormIntegrati
         }
       }
       $basket->setDeliveryNetAmount($delivery);
-      $basket->setDeliveryTaxAmount($taxAmount);
     }
 
     $request = $sagepayFormApi->createRequest();
