@@ -302,6 +302,7 @@ class FormIntegration extends OffsitePaymentGatewayBase implements FormIntegrati
     }
 
     $basket->setDescription($this->configuration['sagepay_order_description']);
+    $basket->setId($order->getOrderNumber() ?? $order->id());
     $sagepayFormApi->setBasket($basket);
 
     $sagepayFormApi->addAddress($this->getBillingAddress($order));
