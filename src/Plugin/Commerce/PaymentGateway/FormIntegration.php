@@ -241,9 +241,27 @@ class FormIntegration extends OffsitePaymentGatewayBase implements FormIntegrati
       $logContext = $sagepayError['logContext'];
       $this->loggerChannelFactory->get('commerce_sagepay')
         ->log($logLevel, $logMessage, $logContext);
-      \Drupal::messenger()->{$sagepayError['drupalMessageType']}($sagepayError['drupalMessage']);
+      $this->messenger()->addMessage($sagepayError['drupalMessage'], $sagepayError['drupalMessageType']);
       throw new PaymentGatewayException('ERROR result from Sagepay for order ' . $decryptedSagepayResponse['VendorTxCode']);
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function onCancel(OrderInterface $order, Request $request) {
+    $formPassword = $this->getMode() == SAGEPAY_ENV_LIVE ? $this->configuration['enc_key'] : $this->configuration['test_enc_key'];
+    $decryptedSagepayResponse = $this->decryptSagepayResponse($formPassword, $this->requestStack->getCurrentRequest()->query->get('crypt'));
+    $sagepayError = $this->decipherSagepayError($order, $decryptedSagepayResponse);
+    $logLevel = $sagepayError['logLevel'];
+    $logMessage = $sagepayError['logMessage'];
+    $logContext = $sagepayError['logContext'];
+    $this->loggerChannelFactory->get('commerce_sagepay')
+      ->log($logLevel, $logMessage, $logContext);
+    $this->messenger()->addMessage($sagepayError['drupalMessage'], $sagepayError['drupalMessageType']);
+    $this->messenger()->addMessage($this->t('If you canceled checkout at @gateway you may resume the checkout process here when you are ready. If you didn\'t cancel payment, there was an error taking payment with the provider. Please try later or contact us.', [
+      '@gateway' => $this->getDisplayLabel(),
+    ]));
   }
 
   /**
